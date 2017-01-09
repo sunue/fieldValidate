@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tool="http://www.springframework.org/schema/tool"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	                    http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+	                    http://www.springframework.org/schema/context
+	                    http://www.springframework.org/schema/context/spring-context-4.0.xsd
+	                    http://www.springframework.org/schema/tx
+	                    http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+	                    http://www.springframework.org/schema/aop 
+	                    http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+	                    http://www.springframework.org/schema/tool	                    
+	                    http://www.springframework.org/schema/tool/spring-tool-4.0.xsd
+	                 	http://www.springframework.org/schema/mvc
+	                    http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd">
+	<!-- 国际化信息 -->               
+	<!-- <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="defaultEncoding" value="UTF-8"></property>
+		<property name="basenames">
+			<list>
+				<value>properties/i18n_validate</value>
+				<value>properties/i18n_dictionary</value>
+			</list>
+		</property>
+	</bean> -->
+	 
+	<!-- 请求字段校验策略配置 -->                   
+	<bean id="validateConfig" class="com.tzp.fieldvalidate.ValidateConfig">
+		<!-- 请求及其字段校验规则的配置 -->
+		<property name="fieldConfig">
+			<map>
+				<entry key="/parent"><!-- 请求key,继承父配置key -->
+					<map>
+						<entry key="name"><value>nameStyle[length:5]</value></entry><!--key：字段ognl表达式，value：style配置  -->
+						<entry key="sex"><value>sexStyle</value></entry>
+					</map>
+				</entry>
+				<entry key="/test1/method1,/parent"><!-- 请求key,继承父配置key -->
+					<map>
+						<entry key="studentId"><value>idStyle[length:12-12]</value></entry>
+						<entry key="major"><value>nameStyle[length:20]</value></entry>
+					</map>
+				</entry>
+				<entry key="/test1/method2,/parent"><!-- 请求key,继承父配置key -->
+					<map>
+						<entry key="studentId"><value>idStyle[length:12-12]</value></entry>
+						<entry key="major"><value>nameStyle[length:20]</value></entry>
+						<entry key="alias">
+							<map>
+								<entry key="#root"><value>nameStyle[length:5]</value></entry>
+							</map>
+						</entry>
+						<entry key="teacher">
+							<map>
+								<entry key="teacherName"><value>nameStyle[length:5]</value></entry>
+								<entry key="teacherSubject"><value>nameStyle[length:20]</value></entry>
+								<entry key="teachClass">
+									<map>
+										<entry key="classId"><value>idStyle[length:10-10]</value></entry>
+										<entry key="className"><value>nameStyle[length:20]</value></entry>
+									</map>
+								</entry>
+							</map>
+						</entry>
+						<entry key="dormitory.dormitoryId"><value>idStyle[length:3-3]</value></entry>
+						<entry key="dormitory.dormitoryAddress"><value>nameStyle[length:50]</value></entry>
+						<entry key="dormitory.dormitoryAlias"><value>nameStyle[required:false;length:50]</value></entry>
+						<entry key="motto"><value>commomStyle</value></entry>
+						<entry key="motto1"><value>xssStyle</value></entry>
+						<entry key="birthday"><value>dateTimeStyle</value></entry>
+					</map>
+				</entry>
+				<entry key="/test1/method3"><!-- 请求key,继承父配置key -->
+					<map>
+						<entry key="name"><value>nameStyle[length:5]</value></entry>
+						<entry key="sex"><value>sexStyle</value></entry>
+					</map>
+				</entry>
+			</map>
+		</property>
+		<!-- 可重用校验规则的配置 -->
+		<property name="styleConfig">
+			<map>
+				<!-- 名称类字段校验设计 -->
+				<entry key="nameStyle">
+					<list><!-- 校验规则所需校验器的有序列表 -->
+						<value>required:true</value><!-- 校验器名，校验规则表达式 -->
+						<value>pattern:^[a-zA-Z0-9\u4e00-\u9fa5.]+$</value>
+						<value>length:32</value>
+					</list>
+				</entry>
+				<entry key="sexStyle">
+					<list><!-- 校验规则所需校验器的有序列表 -->
+						<value>required:true</value><!-- 校验器名，校验规则表达式 -->
+						<value>pattern:^[男女]{1}$</value>
+					</list>
+				</entry>
+				<entry key="idStyle">
+					<list><!-- 校验规则所需校验器的有序列表 -->
+						<value>required:true</value><!-- 校验器名，校验规则表达式 -->
+						<value>pattern:^[a-zA-Z0-9]+$</value>
+						<value>length:32</value>
+					</list>
+				</entry>
+				<entry key="commomStyle">
+					<list><!-- 校验规则所需校验器的有序列表 -->
+						<value>required:true</value><!-- 校验器名，校验规则表达式 -->
+						<value>pattern:^[^&lt;&gt;&amp;&quot;&apos;]+$</value>
+						<value>length:1024</value>
+					</list>
+				</entry>
+				<entry key="xssStyle">
+					<list><!-- 校验规则所需校验器的有序列表 -->
+						<value>required:true</value><!-- 校验器名，校验规则表达式 -->
+						<value>xss</value>
+						<value>length:1024</value>
+					</list>
+				</entry>
+				<!-- 时间(yyyy-MM-dd HH:mm:ss)字段校验设计 -->
+				<entry key="dateTimeStyle">
+					<list><!-- 校验规则所需校验器的有序列表 -->
+						<value>required:true</value><!-- 校验器名，校验规则表达式 -->
+						<value>pattern:^(?:(?!0000)[0-9]{4}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1[0-9]|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[0-9]{2}(?:0[48]|[2468][048]|[13579][26])|(?:0[48]|[2468][048]|[13579][26])00)-02-29)\s+([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$</value>
+						<value>dateTime</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+	<!-- 校验执行器 -->
+	<bean id="validateExecutor" class="com.tzp.fieldvalidate.ValidateExecutor">
+		<property name="validateConfig" ref="validateConfig"/>
+		<property name="validatorRegistry"><!-- 校验器注册表 -->
+			<map>
+				<entry key="required" value-ref="required"></entry>
+				<entry key="pattern" value-ref="pattern"></entry>
+				<entry key="length" value-ref="length"></entry>
+				<entry key="xss" value-ref="xss"></entry>
+				<entry key="dateTime" value-ref="dateTime"></entry>
+			</map>
+		</property>
+	</bean>
+	
+	<!-- 用于校验的校验器 -->
+	<bean id="required" class="com.tzp.fieldvalidate.validator.impl.RequiredValidator"></bean>
+	<bean id="pattern" class="com.tzp.fieldvalidate.validator.impl.PatternValidator"></bean>
+	<bean id="length" class="com.tzp.fieldvalidate.validator.impl.LengthValidator"></bean>
+	<bean id="xss" class="com.tzp.fieldvalidate.validator.impl.XssValidator"></bean>
+	<bean id="dateTime" class="com.tzp.fieldvalidate.validator.impl.DateValidator">
+		<property name="formatPattern" value="yyyy-MM-dd HH:mm:ss"/>
+	</bean>
+</beans>
