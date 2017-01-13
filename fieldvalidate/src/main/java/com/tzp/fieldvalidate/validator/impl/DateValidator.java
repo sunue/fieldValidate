@@ -14,6 +14,7 @@ public class DateValidator implements ReturnValueValidator {
     //注释
     //hdsdhsh   
     //是你打静安寺
+    //sjdjsdjsndjsdnsjdnsjndjnsj
     public Object validate(String fieldName, Object fieldValue, String rule) {
         if (fieldValue != null && fieldValue.getClass().isArray()) {
             fieldValue = ((Object[]) fieldValue)[0];
