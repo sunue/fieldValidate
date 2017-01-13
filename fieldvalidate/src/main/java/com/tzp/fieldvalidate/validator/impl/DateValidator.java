@@ -12,7 +12,8 @@ public class DateValidator implements ReturnValueValidator {
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     //注释
-    //hdsdhsh   
+    //hdsdhsh  
+    //测试测试测试
     public Object validate(String fieldName, Object fieldValue, String rule) {
         if (fieldValue != null && fieldValue.getClass().isArray()) {
             fieldValue = ((Object[]) fieldValue)[0];
